@@ -1,0 +1,28 @@
+# File produced by Open Asset Import Library (http://www.assimp.sf.net)
+# (assimp v3.1.187496374)
+
+newmtl Texture_0
+illum 1
+map_Kd axe_body_color.bmp
+map_Bump axe_body_normal.bmp
+
+newmtl Texture_1
+illum 1
+map_Kd axe_belt_color.bmp
+map_Bump axe_belt_normal.bmp
+
+newmtl Texture_2
+illum 1
+map_Kd axe_armor_color.bmp
+map_Bump axe_armor_normal.bmp
+
+newmtl Texture_3
+illum 1
+map_Kd axe_hair_color.bmp
+map_Bump axe_hair_normal.bmp
+
+newmtl Texture_4
+illum 1
+map_Kd axe_weapon_color.bmp
+map_Bump axe_weapon_normal.bmp
+

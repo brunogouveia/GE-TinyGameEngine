@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ge>
+	<window>
+		<name>My scene</name>
+		<width>1024</width>
+		<height>780</height>
+	</window>
+	<camera>
+		<model>
+			<rotate angle="3.14"/>
+			<rotate angle="-0.78">
+				<normal x="1" y="0" z="0"/>
+			</rotate>
+			<translate x="0" y="4.5" z="3.5"/>
+		</model>
+		<!-- <position x="0" y="4.5" z="3.5"/>
+		<direction x="0" y="-0.5" z="-1"/>
+		<up x="0" y="1" z="-0.5"/> -->
+		<!-- You can attach a script to the camera, because it's a transform -->
+		<scripts>
+			<script name="CameraScript"/>
+		</scripts>
+	</camera>
+	<scene>
+		<!-- List of objects (cube or mesh) -->
+		<objects>
+			<mesh file="obj/dante/001.obj">
+				<model>
+					<!-- <scale x="0.02" y="0.02" z="0.02"/> -->
+					<!-- <rotate angle="1.7"/> -->
+				</model>
+				<!-- <light-shader vert="shaders/phongl.vert" frag="shaders/phongl-nm.frag"/> -->
+				<!-- <texture file="textures/axe_weapon_color.bmp"/> -->
+				<!-- <normal-map file="textures/axe_weapon_normal.bmp"/> -->
+			</mesh>
+		</objects>
+		<!-- List o lights -->
+		<lights>
+			<light>
+				<!-- Positio and direction are required -->
+				<position x="0" y="4.5" z="0"/>
+				<direction x="0" y="-1" z="0"/>
+				<!-- Each color attribute is optional -->
+				<diffuse r="0.9" g="0.9" b="0.9"/>
+				<specular r="0.9" g="0.9" b="0.9"/>
+			</li1ght>
+			<light>
+				<position x="0" y="12.0" z="-15"/>
+				<direction x="0" y="-1.0" z="1.0"/>
+				<angle value="80"/>
+				<diffuse r="0.9" g="0.9" b="0.9"/>
+				<specular r="0.9" g="0.9" b="0.9"/>
+				<!-- You can attach a script to the light, because it's a transform -->
+				<scripts>
+					<script name="LightScript"/>
+				</scripts>
+			</light>
+		</lights>
+	</scene>
+</ge>

@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ge>
+	<window>
+		<name>My scene</name>
+		<width>1024</width>
+		<height>780</height>
+	</window>
+	<camera>
+		<model>
+			<rotate angle="3.14"/>
+			<rotate angle="-0.78">
+				<normal x="1" y="0" z="0"/>
+			</rotate>
+			<translate x="0" y="4.5" z="3.5"/>
+		</model>
+		<!-- <position x="0" y="4.5" z="3.5"/>
+		<direction x="0" y="-0.5" z="-1"/>
+		<up x="0" y="1" z="-0.5"/> -->
+		<!-- You can attach a script to the camera, because it's a transform -->
+		<scripts>
+			<script name="CameraScript"/>
+		</scripts>
+	</camera>
+	<scene>
+		<!-- List of objects (cube or mesh) -->
+		<objects>
+			<!-- Firs cube - ground -->
+			<cube>
+				<!-- Basic transformation. Maybe you want your model be smaller and then translated to some position
+					You shoul use these tags to specify it.
+				 -->
+				<model>
+					<!-- Series of transformatio in order -->
+					<scale x="20" y="0.05" z="20"/>
+				</model>
+				<!-- Set material, each attribute is optional -->
+				<material>
+					<ambient r="1" g="0" b="0"/>
+					<diffuse r="1" g="0.3" b="0.1"/>
+				</material>
+				<!-- Define basic shader - the shader used to renderer the ambient color -->
+				<basic-shader vert="shaders/phong.vert" frag="shaders/phong.frag"/>
+				<!-- Define light shader - the shader used to renderer the light (diffuse, specular) -->
+				<light-shader vert="shaders/phongl.vert" frag="shaders/phongl.frag"/>
+
+				<!-- IT'S POSSIBLE TO ATTACH A SCRIPT TO AN OBJECT AS WELL, BUT I DID'T -->
+			</cube>
+			<cube>
+				<model>
+					<!-- Series of transformatio in order -->
+					<translate x="7" y="1" z="0"/>
+				</model>
+			</cube>
+			<!-- House model -->
+			<mesh file="obj/houseA_obj.obj">
+				<model>
+					<scale x="0.1" y="0.1" z="0.1"/>
+				</model>
+				<!-- Notice that i'm using a diferent frag shader for light, this is because this model requires normal map -->
+				<light-shader vert="shaders/phongl.vert" frag="shaders/phongl-nm.frag"/>
+				<!-- Texture to be used - it can't load the texture from the mtl file yet -->
+				<texture file="textures/houseA.bmp"/>
+				<!-- Normal map file -->
+				<normal-map file="textures/houseANM.bmp"/>
+			</mesh>
+			<!-- Weird guy model -->
+			<mesh file="obj/axe_armor.obj">
+				<model>
+					<scale x="0.02" y="0.02" z="0.02"/>
+				</model>
+				<light-shader vert="shaders/phongl.vert" frag="shaders/phongl-nm.frag"/>
+				<texture file="textures/axe_armor_color.bmp"/>
+				<normal-map file="textures/axe_armor_normal.bmp"/>
+			</mesh>
+			<mesh file="obj/axe_belt.obj">
+				<model>
+					<scale x="0.02" y="0.02" z="0.02"/>
+				</model>
+				<light-shader vert="shaders/phongl.vert" frag="shaders/phongl-nm.frag"/>
+				<texture file="textures/axe_belt_color.bmp"/>
+				<normal-map file="textures/axe_belt_normal.bmp"/>
+			</mesh>
+			<mesh file="obj/axe_body.obj">
+				<model>
+					<scale x="0.02" y="0.02" z="0.02"/>
+				</model>
+				<light-shader vert="shaders/phongl.vert" frag="shaders/phongl-nm.frag"/>
+				<texture file="textures/axe_body_color.bmp"/>
+				<normal-map file="textures/axe_body_normal.bmp"/>
+			</mesh>
+			<mesh file="obj/axe_weapon.obj">
+				<model>
+					<scale x="0.02" y="0.02" z="0.02"/>
+					<rotate angle="1.7"/>
+				</model>
+				<light-shader vert="shaders/phongl.vert" frag="shaders/phongl-nm.frag"/>
+				<texture file="textures/axe_weapon_color.bmp"/>
+				<normal-map file="textures/axe_weapon_normal.bmp"/>
+			</mesh>
+		</objects>
+		<!-- List o lights -->
+		<lights>
+			<light>
+				<!-- Positio and direction are required -->
+				<position x="0" y="4.5" z="0"/>
+				<direction x="0" y="-1" z="0"/>
+				<!-- Each color attribute is optional -->
+				<diffuse r="0.9" g="0.9" b="0.9"/>
+				<specular r="0.9" g="0.9" b="0.9"/>
+			</li1ght>
+			<light>
+				<position x="0" y="12.0" z="-15"/>
+				<direction x="0" y="-1.0" z="1.0"/>
+				<angle value="80"/>
+				<diffuse r="0.9" g="0.9" b="0.9"/>
+				<specular r="0.9" g="0.9" b="0.9"/>
+				<!-- You can attach a script to the light, because it's a transform -->
+				<scripts>
+					<script name="LightScript"/>
+				</scripts>
+			</light>
+		</lights>
+	</scene>
+</ge>
