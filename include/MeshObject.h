@@ -17,7 +17,7 @@ public:
 		begin(b),
 		end(e),
 		texture(GL_TEXTURE0),
-		normalMap(GL_TEXTURE1, true),
+		normalMap(GL_TEXTURE2, true),
 		material(NULL)
 	{};
 };
@@ -62,6 +62,9 @@ public:
     virtual void rendererPass(bool useLight);
 
     virtual void deferredPass();
+
+    virtual void setTexture(Texture newTexture);
+    virtual void setNormalMap(Texture newNormalMap);
 
     /**
      *  This method loads the triangle mesh from a file. If you don't

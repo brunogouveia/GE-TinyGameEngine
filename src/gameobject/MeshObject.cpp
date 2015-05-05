@@ -95,21 +95,21 @@ void MeshObject::rendererPass(bool useLight) {
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9*sizeof(float), (void*)(7*sizeof(float)));
 
 //    // Activate texture
-//    texture.active();
-//    // Bind texture
-//    texture.bind();
+    texture.active();
+    // Bind texture
+    texture.bind();
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, Light::getShadowTexture());
-//    glTexGendv(GL_S,GL_EYE_PLANE,Light::Svec);
-//    glTexGendv(GL_T,GL_EYE_PLANE,Light::Tvec);
-//    glTexGendv(GL_R,GL_EYE_PLANE,Light::Rvec);
-//    glTexGendv(GL_Q,GL_EYE_PLANE,Light::Qvec);
-//    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_COMPARE_MODE,GL_COMPARE_R_TO_TEXTURE);
+    glTexGendv(GL_S,GL_EYE_PLANE,Light::Svec);
+    glTexGendv(GL_T,GL_EYE_PLANE,Light::Tvec);
+    glTexGendv(GL_R,GL_EYE_PLANE,Light::Rvec);
+    glTexGendv(GL_Q,GL_EYE_PLANE,Light::Qvec);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_COMPARE_MODE,GL_COMPARE_R_TO_TEXTURE);
 //
 //    // Activate normalMap
-//    normalMap.active();
-//    // Bind normal Map
-//    normalMap.bind();
+    normalMap.active();
+    // Bind normal Map
+    normalMap.bind();
 
     GameWindow::getRenderer()->bindDeferredTextures(useLight ? lightShader : basicShader);
 
@@ -131,8 +131,6 @@ void MeshObject::rendererPass(bool useLight) {
     	shapeVector[i]->texture.bind();
     	shapeVector[i]->normalMap.active();
     	shapeVector[i]->normalMap.bind();
-//    	if (shapeVector[i].useNormal == false)
-//    		continue;
 		glDrawArrays(GL_TRIANGLES, shapeVector[i]->begin, shapeVector[i]->end - shapeVector[i]->begin + 1);
 	}
 
@@ -178,6 +176,20 @@ void MeshObject::deferredPass() {
     // Unbind everything
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER,0);
+}
+
+void MeshObject::setTexture(Texture newTexure) {
+	GameObject::setTexture(newTexure);
+	for (unsigned int i = 0; i < shapeVector.size(); i++) {
+		shapeVector[i]->texture = newTexure;
+	}
+}
+
+void MeshObject::setNormalMap(Texture newNormalMap) {
+	GameObject::setNormalMap(newNormalMap);
+	for (unsigned int i = 0; i < shapeVector.size(); i++) {
+		shapeVector[i]->normalMap = newNormalMap;
+	}
 }
 
 void MeshObject::loadFromFile(char * fileName) {
@@ -291,11 +303,14 @@ void MeshObject::loadFromFile(char * fileName) {
         // Update end index of shape
         currentShape->end += shapes[i].mesh.indices.size() - 1;
 
-        // Set shape's material
-        currentShape->material = materialsPtr[shapes[i].mesh.material_ids[0]];
-        // Set shape's texture
-		currentShape->texture = textures[shapes[i].mesh.material_ids[0]];
-		currentShape->normalMap = normalMaps[shapes[i].mesh.material_ids[0]];;
+		if (shapes[i].mesh.material_ids[0] >= 0) {
+			std::cout << "Maior" << std::endl;
+			// Set shape's material
+			currentShape->material = materialsPtr[shapes[i].mesh.material_ids[0]];
+			// Set shape's texture
+			currentShape->texture = textures[shapes[i].mesh.material_ids[0]];
+			currentShape->normalMap = normalMaps[shapes[i].mesh.material_ids[0]];
+		}
 
 		// Add to shapesVector
         shapeVector.push_back(currentShape);

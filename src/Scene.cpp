@@ -47,7 +47,7 @@ void Scene::drawObjectsWithLights() {
 		glDepthFunc(GL_LEQUAL);
 		// Disable texture
 		glDisable(GL_TEXTURE_2D);
-		glPolygonOffset(10,0);
+		glPolygonOffset(3,0);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 
 		// Set depth framebuffer

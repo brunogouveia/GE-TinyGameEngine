@@ -186,7 +186,7 @@ namespace GL
 		{
 			for ( ushort x = 0; x < width; x++ )
 			{
-				uint o = rawHeight > 0 ? x + ( height - y - 1 ) * width : x + y * width; // Flip image vertically if height is negative
+				uint o = rawHeight > 0 ? x + y * width : x + ( height - y - 1 ) * width; // Flip image vertically if height is negative
 				image[ o ] = Color( data.PeekByte( 2 ), data.PeekByte( 1 ), data.PeekByte( 0 ) ); // BGR byte order
 				data.Advance( 3 );
 				if ( x == width - 1 ) data.Advance( padding );
@@ -268,7 +268,7 @@ namespace GL
 		// Pixel data
 		image = new Color[ width * height ];
 
-		for ( short y = height - 1; y >= 0; y-- )
+		for ( short y = 0; y < height; y++ )
 		{
 			for ( ushort x = 0; x < width; x++ )
 			{

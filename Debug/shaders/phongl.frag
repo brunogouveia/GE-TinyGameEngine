@@ -60,37 +60,44 @@ uniform sampler2DShadow depthText;
 //  Fragment color
 layout (location=0) out vec4 Fragcolor;
 
-
 vec4 phong()
 {
 	// Compute PosModelCoord in light coordinates
 	vec4 ShadowCoord = shadows.DepthBiasMVP * PosModelCoord;
 	ShadowCoord /= ShadowCoord.w;
 
+	float shadowFactor = 0.0;
+	for (float x = -1.5; x <= 1.5; ++x) {
+		for (float y = -1.5; y <= 1.5; ++y)	{
+			shadowFactor += textureProj(depthText, ShadowCoord + (1.0/2048.0)*vec4(x,y,0.0,0.0));
+		}
+	}
+	shadowFactor = shadowFactor/16.0;
+
 	// if (textureProj(depthText, ShadowCoord) == 1.0 && length(ShadowCoord.xy - vec2(0.5)) <= 0.5) {
-		// Position in eye coordinates
-		vec3 pos = IPosition;
+	// Position in eye coordinates
+	vec3 pos = IPosition;
 
-		// Normal in eye coordinates
-		vec3 N = normalize(INormal);
+	// Normal in eye coordinates
+	vec3 N = normalize(INormal);
 
-		// Light vector
-		vec3 L = normalize(vec3(tranformations.ViewMatrix * light.position) - pos);
+	// Light vector
+	vec3 L = normalize(vec3(tranformations.ViewMatrix * light.position) - pos);
 
-		// Reflection vector
-		vec3 R = reflect(-L, N);
+	// Reflection vector
+	vec3 R = reflect(-L, N);
 
-		// View vector in eye coordinates
-		vec3 V = normalize(-pos);
+	// View vector in eye coordinates
+	vec3 V = normalize(-pos);
 
-		// Diffuse light intensity
-		float Id = max(0.0, dot(N, L));
+	// Diffuse light intensity
+	float Id = max(0.0, dot(N, L));
 
-		// Specular light intensity
-		float Is = (Id > 0.0) ? pow(max(0.0, dot(R, V)), material.specular[3]) : 0.0;
+	// Specular light intensity
+	float Is = (Id > 0.0) ? pow(max(0.0, dot(R, V)), material.specular[3]) : 0.0;
 
-		return vec4(N, 1);
-		// return Id*light.diffuse*material.diffuse + Is*light.specular*vec4(vec3(material.specular),1.0);
+	// return vec4(factor);
+	return (Id*light.diffuse*material.diffuse + Is*light.specular*vec4(vec3(material.specular),1.0)) * shadowFactor;
 	// } else {
 	// 	return vec4(0.0);
 	// }

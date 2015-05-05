@@ -39,9 +39,9 @@
 					<diffuse r="1" g="0.3" b="0.1"/>
 				</material>
 				<!-- Define basic shader - the shader used to renderer the ambient color -->
-				<basic-shader vert="shaders/phong.vert" frag="shaders/phong.frag"/>
+				<!-- <basic-shader vert="shaders/phong.vert" frag="shaders/phong.frag"/> -->
 				<!-- Define light shader - the shader used to renderer the light (diffuse, specular) -->
-				<light-shader vert="shaders/phongl.vert" frag="shaders/phongl.frag"/>
+				<!-- <light-shader vert="shaders/phongl.vert" frag="shaders/phongl.frag"/> -->
 
 				<!-- IT'S POSSIBLE TO ATTACH A SCRIPT TO AN OBJECT AS WELL, BUT I DID'T -->
 			</cube>
@@ -69,24 +69,24 @@
 					<scale x="0.02" y="0.02" z="0.02"/>
 				</model>
 				<light-shader vert="shaders/phongl.vert" frag="shaders/phongl-nm.frag"/>
-				<texture file="textures/axe_armor_color.bmp"/>
-				<normal-map file="textures/axe_armor_normal.bmp"/>
+				<texture file="textures/axe_armor_color.tga"/>
+				<normal-map file="textures/axe_armor_normal.tga"/>
 			</mesh>
 			<mesh file="obj/axe_belt.obj">
 				<model>
 					<scale x="0.02" y="0.02" z="0.02"/>
 				</model>
 				<light-shader vert="shaders/phongl.vert" frag="shaders/phongl-nm.frag"/>
-				<texture file="textures/axe_belt_color.bmp"/>
-				<normal-map file="textures/axe_belt_normal.bmp"/>
+				<texture file="textures/axe_belt_color.tga"/>
+				<normal-map file="textures/axe_belt_normal.tga"/>
 			</mesh>
 			<mesh file="obj/axe_body.obj">
 				<model>
 					<scale x="0.02" y="0.02" z="0.02"/>
 				</model>
 				<light-shader vert="shaders/phongl.vert" frag="shaders/phongl-nm.frag"/>
-				<texture file="textures/axe_body_color.bmp"/>
-				<normal-map file="textures/axe_body_normal.bmp"/>
+				<texture file="textures/axe_body_color.tga"/>
+				<normal-map file="textures/axe_body_normal.tga"/>
 			</mesh>
 			<mesh file="obj/axe_weapon.obj">
 				<model>
@@ -94,27 +94,24 @@
 					<rotate angle="1.7"/>
 				</model>
 				<light-shader vert="shaders/phongl.vert" frag="shaders/phongl-nm.frag"/>
-				<texture file="textures/axe_weapon_color.bmp"/>
-				<normal-map file="textures/axe_weapon_normal.bmp"/>
+				<texture file="textures/axe_weapon_color.tga"/>
+				<normal-map file="textures/axe_weapon_normal.tga"/>
 			</mesh>
 		</objects>
 		<!-- List o lights -->
 		<lights>
-			<light>
-				<!-- Positio and direction are required -->
+			<!-- <light>
 				<position x="0" y="4.5" z="0"/>
 				<direction x="0" y="-1" z="0"/>
-				<!-- Each color attribute is optional -->
 				<diffuse r="0.9" g="0.9" b="0.9"/>
 				<specular r="0.9" g="0.9" b="0.9"/>
-			</li1ght>
+			</li1ght> -->
 			<light>
 				<position x="0" y="12.0" z="-15"/>
 				<direction x="0" y="-1.0" z="1.0"/>
 				<angle value="80"/>
 				<diffuse r="0.9" g="0.9" b="0.9"/>
 				<specular r="0.9" g="0.9" b="0.9"/>
-				<!-- You can attach a script to the light, because it's a transform -->
 				<scripts>
 					<script name="LightScript"/>
 				</scripts>

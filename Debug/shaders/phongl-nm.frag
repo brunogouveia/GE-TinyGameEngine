@@ -87,6 +87,14 @@ vec4 phong()
 	vec4 ShadowCoord = shadows.DepthBiasMVP * PosModelCoord;
 	ShadowCoord /= ShadowCoord.w;
 
+	float shadowFactor = 0.0;
+	for (float x = -1.5; x <= 1.5; ++x) {
+		for (float y = -1.5; y <= 1.5; ++y)	{
+			shadowFactor += textureProj(depthText, ShadowCoord + (1.0/2048.0)*vec4(x,y,0.0,0.0));
+		}
+	}
+	shadowFactor = shadowFactor/16.0;
+
 	// if (textureProj(depthText, ShadowCoord) == 1.0 && length(ShadowCoord.xy - vec2(0.5)) <= 0.5) {
 		// Position in eye coordinates
 		vec3 pos = IPosition;
@@ -118,7 +126,7 @@ vec4 phong()
 		// Specular light intensity
 		float Is = (Id > 0.0) ? pow(max(0.0, dot(R, V)), material.specular[3]) : 0.0;
 
-		return (Id*light.diffuse*material.diffuse + Is*light.specular*vec4(vec3(material.specular),1.0));
+		return (Id*light.diffuse*material.diffuse + Is*light.specular*vec4(vec3(material.specular),1.0)) * shadowFactor;
 	// } else {
 	// 	vec4(0.0);
 	// }
