@@ -3,7 +3,7 @@
 
 void LightScript::OnUpdate() {
 	static bool isPressed = false;
-	glm::vec3 up = glm::vec3(0, 1, 0);
+	glm::vec3 up = glm::vec3(0, 0, 1);
 	if (Input::getKey('l')) {
 		isPressed = !isPressed;
 	}

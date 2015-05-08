@@ -1,7 +1,7 @@
 #version 400 core
 
 //  Transformation matrices
-uniform Tranformations {
+uniform CameraInfos {
 	// Projection Matrix
 	mat4 ProjectionMatrix;
 	// Model Matrix
@@ -10,7 +10,7 @@ uniform Tranformations {
 	mat4 ViewMatrix;
 	// Normal matrix;
 	mat4 NormalMatrix;
-} tranformations;
+} cameraInfo;
 
 // Material
 uniform Material {
@@ -39,6 +39,8 @@ uniform Shadows {
 	mat4 depthMVP;
 	// Model Matrix
 	mat4 DepthBiasMVP;
+	float zNear;
+	float zFar;
 } shadows;
 
 uniform vec2 dimension;
@@ -56,11 +58,11 @@ out vec2 ITextCoord;
 void main()
 {	
    //  Pass all attributes to fragment shader (will be interpolated)
-   vec4 P = tranformations.ViewMatrix * tranformations.ModelMatrix * Vertex;
+   vec4 P = cameraInfo.ViewMatrix * cameraInfo.ModelMatrix * Vertex;
    IPosition = vec3(P.xyz / P.w);
-   INormal = normalize(mat3(tranformations.NormalMatrix) * Normal);
+   INormal = normalize(mat3(cameraInfo.NormalMatrix) * Normal);
    ITextCoord = TextCoord;
 
    //  Set transformed vertex location
-   gl_Position =  tranformations.ProjectionMatrix * tranformations.ViewMatrix * tranformations.ModelMatrix * Vertex;
+   gl_Position =  cameraInfo.ProjectionMatrix * cameraInfo.ViewMatrix * cameraInfo.ModelMatrix * Vertex;
 }

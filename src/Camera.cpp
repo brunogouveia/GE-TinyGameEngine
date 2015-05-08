@@ -24,7 +24,7 @@ Camera::Camera() : projectionBindingPoint(1) {
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	// Initialize fov and asp
-    fov=55.0;   //  Field of view (angles)
+    fov=90.0;   //  Field of view (angles)
     asp=1;      //  Screen aspect ratio
     updateProjectioneMatrix();
     updateMatrices();
@@ -41,9 +41,9 @@ Camera::~Camera() {
  */
 void Camera::bindProjectionBuffer(int shader) {
     // Find uniform block id
-    int id = glGetUniformBlockIndex(shader, "Tranformations");
+    int id = glGetUniformBlockIndex(shader, "CameraInfos");
     // Set binding point
-    if (id > 0) glUniformBlockBinding(shader, id, projectionBindingPoint);
+	if (id >= 0) glUniformBlockBinding(shader, id, projectionBindingPoint);
 }
 
 /**

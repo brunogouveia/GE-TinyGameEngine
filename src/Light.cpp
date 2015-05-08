@@ -1,6 +1,7 @@
 #include "Light.h"
 #include <cstring>
 #include <GameWindow.h>
+#include <iostream>
 
 // Global
 GLuint  Light::globalLightBuffer;
@@ -14,6 +15,7 @@ int     Light::shadowBindingPoint = 4;
 GLuint  Light::shadowFrameBuffer;
 int     Light::shadowShader;
 GLuint  Light::shadowTexture;
+GLuint  Light::shadowCubeMap;
 
 // Shadow texture planes
 double  Light::Svec[4];   // Texture planes S
@@ -44,21 +46,22 @@ Light::Light() {
     // Copy to light's data
     std::memcpy(data, newData, sizeof(data));
 
-    updateMatrices();
+    updateMatrices(direction, up);
 }
 
 Light::~Light() {
     // do nothing
 }
 
-void Light::activeLight() {
-    // Bind local buffer
+void Light::activeLight(glm::vec3 direction, glm::vec3 up) {
+	// Bind local buffer
     glBindBuffer(GL_UNIFORM_BUFFER, lightBuffer);
 
     // Copy light's data to buffer
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(data), data);
 
-    updateMatrices();
+
+    updateMatrices(direction, up);
 
     // Unbind buffer
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
@@ -108,7 +111,7 @@ void Light::init() {
     glBindBuffer(GL_UNIFORM_BUFFER, shadowBuffer);
 
     // Copy global data to buffer
-    float shadowData[36] = {0};
+    float shadowData[34] = {0};
     glBufferData(GL_UNIFORM_BUFFER, sizeof(shadowData), shadowData, GL_DYNAMIC_DRAW);
 
     // Set binding point
@@ -161,6 +164,22 @@ void Light::initShadowMap(int shadowShader) {
     glTexGeni(GL_T,GL_TEXTURE_GEN_MODE,GL_EYE_LINEAR);
     glTexGeni(GL_R,GL_TEXTURE_GEN_MODE,GL_EYE_LINEAR);
     glTexGeni(GL_Q,GL_TEXTURE_GEN_MODE,GL_EYE_LINEAR);
+
+	// Create the cube map
+	glGenTextures(1, &shadowCubeMap);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, shadowCubeMap);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+	for (unsigned int i = 0 ; i < 6 ; i++) {
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB32F, shadowdim, shadowdim, 0, GL_RGB, GL_FLOAT, NULL);
+	}
+
     
     // Switch back to default textures
     glActiveTexture(GL_TEXTURE0);
@@ -170,8 +189,8 @@ void Light::initShadowMap(int shadowShader) {
     glBindFramebuffer(GL_FRAMEBUFFER,shadowFrameBuffer);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowTexture, 0);
     //  Don't write or read to visible color buffer
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
+    GLenum drawBuffers[] = {GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT};
+    glDrawBuffers(1, drawBuffers);
     //  Make sure this all worked
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) Fatal("Error setting up frame buffer\n");
     glBindFramebuffer(GL_FRAMEBUFFER,0);
@@ -211,7 +230,7 @@ GLuint Light::getShadowTexture() {
 }
 
 
-void Light::updateMatrices() {
+void Light::updateMatrices(glm::vec3 direction, glm::vec3 up) {
     //  Light distance
     float Dim = GameWindow::dim;
     float Ldist = sqrt(data[0]*data[0] + data[1]*data[1] + data[2]*data[2]);
@@ -219,10 +238,16 @@ void Light::updateMatrices() {
 
     float zNear = (Dim > 10 ) ? Ldist/Dim : Ldist / 10;
     float zFar = (1.4*Ldist > Ldist + Dim) ? 1.4*Ldist : Ldist + Dim ;
+    zNear = 1;
+    zFar = 50;
+
+    std::cout << "Position " << " " << position[0] << " " << position[1] << " " << position[2] << std::endl;
+    std::cout << "Direction" << " " << direction[0] << " " << direction[1] << " " << direction[2] << std::endl;
+    std::cout << "Up       " << " " << up[0] << " " << up[1] << " " << up[2] << std::endl << std::endl;
 
     // Set perspective
-    projectionMatrix = glm::perspective<float>(M_PI*(angle)/180,1,zNear,0.9*zFar);
-    
+    projectionMatrix = glm::perspective<float>(M_PI*(90)/180,1,zNear,zFar);
+
     // Set view
 	viewMatrix = glm::lookAt(position, position + direction, up);
     glm::mat4 modelMatrix = glm::mat4(1.0);
@@ -241,6 +266,10 @@ void Light::updateMatrices() {
     // Copy to buffer
     glBufferSubData(GL_UNIFORM_BUFFER, 16*sizeof(float), 16*sizeof(float), glm::value_ptr(biasMatrix * projectionMatrix * viewMatrix * modelMatrix));
 
+    // Copy zNear and zFar to buffer
+    float planes[] = {zNear, zFar};
+    glBufferSubData(GL_UNIFORM_BUFFER, 32*sizeof(float), 2*sizeof(float), planes);
+
     glm::mat4 Tproj = glm::transpose(biasMatrix * projectionMatrix * viewMatrix * modelMatrix);
     Svec[0] = Tproj[0][0];    Tvec[0] = Tproj[0][1];    Rvec[0] = Tproj[0][2];    Qvec[0] = Tproj[0][3];
     Svec[1] = Tproj[1][0];    Tvec[1] = Tproj[1][1];    Rvec[1] = Tproj[1][2];    Qvec[1] = Tproj[1][3];
@@ -249,8 +278,6 @@ void Light::updateMatrices() {
 
     // Unbind buffer
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-    ErrCheck("Light::updateMatrices");
 }
 
 void Light::setLightAngle(float angle) {
@@ -264,7 +291,7 @@ void Light::setPosition(float x, float y, float z) {
     data[0] = x;
     data[1] = y;
     data[2] = z;
-    updateMatrices();
+    updateMatrices(glm::vec3(1));
 }
 
 void Light::setPosition(float position[]) {
@@ -272,19 +299,19 @@ void Light::setPosition(float position[]) {
 	this->position = glm::vec3(position[0], position[1], position[2]);
     // Copy to light's data
     std::memcpy(data, position, 3*sizeof(float));
-    updateMatrices();
+    updateMatrices(glm::vec3(1));
 }
 
 void Light::setDirection(float x, float y, float z) {
 	// Copy to transform direction
 	direction = glm::vec3(x, y, z);
-    updateMatrices();
+	updateMatrices(glm::vec3(1));
 }
 
 void Light::setDirection(float direction[]) {
 	// Copy to transform direction
 	this->direction = glm::vec3(direction[0], direction[1], direction[2]);
-    updateMatrices();
+	updateMatrices(glm::vec3(1));
 }
 
 void Light::setDiffuse(float r, float g, float b) {
@@ -318,7 +345,7 @@ void Light::translate(glm::vec3 & t){
     data[0] += t[0];
     data[1] += t[1];
     data[2] += t[2];
-    updateMatrices();
+    updateMatrices(glm::vec3(1));
 };
 
 void Light::translate(float tx, float ty, float tz) {
@@ -328,7 +355,7 @@ void Light::translate(float tx, float ty, float tz) {
     data[0] += tx;
     data[1] += ty;
     data[2] += tz;
-    updateMatrices();  
+    updateMatrices(glm::vec3(1));
 }
 
 void Light::rotate(float rad, glm::vec3 & normal) {
@@ -341,7 +368,7 @@ void Light::rotate(float rad, glm::vec3 & normal) {
     data[0] = position[0];
     data[1] = position[1];
     data[2] = position[2];
-    updateMatrices();
+    updateMatrices(glm::vec3(1));
 }
 
 void Light::scale(glm::vec3 & s) {
@@ -352,7 +379,7 @@ void Light::scale(glm::vec3 & s) {
     data[0] *= s[0];
     data[1] *= s[1];
     data[2] *= s[2];
-    updateMatrices();
+    updateMatrices(glm::vec3(1));
 }
 
 void Light::scale(float sx, float sy, float sz) {
@@ -363,5 +390,5 @@ void Light::scale(float sx, float sy, float sz) {
     data[0] *= sx;
     data[1] *= sy;
     data[2] *= sz;
-    updateMatrices();  
+    updateMatrices(glm::vec3(1));
 }

@@ -207,9 +207,9 @@ void Renderer::bindDeferredTextures(int shader) {
 	id = glGetUniformLocation(shader, "gNoise");
 		if (id >= 0)
 			glUniform1i(id, 11);
-	id = glGetUniformLocation(shader, "kernel");
-	if (id >= 0)
-		glUniform3fv(id, 128, kernel);
+//	id = glGetUniformLocation(shader, "kernel");
+//	if (id >= 0)
+//		glUniform3fv(id, 128, kernel);
 	id = glGetUniformLocation(shader, "dimension");
 		if (id >= 0) {
 			float dime[] = {float(GameWindow::width), float(GameWindow::height)};
@@ -236,7 +236,7 @@ Camera * Renderer::getCamera() {
 
 void Renderer::display() {
 	// Print fps
-	std::cout << "FPS: " << FramesPerSecond() << std::endl;
+//	std::cout << "FPS: " << FramesPerSecond() << std::endl;
     // Update scripts
     if (scene)
         scene->updateScripts();

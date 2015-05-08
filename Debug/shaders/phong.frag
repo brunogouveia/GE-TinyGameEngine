@@ -1,7 +1,7 @@
 #version 400 core
 
-//  Transformation matrices
-uniform Tranformations {
+//  CameraInfo
+uniform CameraInfos {
 	// Projection Matrix
 	mat4 ProjectionMatrix;
 	// Model Matrix
@@ -10,7 +10,7 @@ uniform Tranformations {
 	mat4 ViewMatrix;
 	// Normal matrix;
 	mat4 NormalMatrix;
-} tranformations;
+} cameraInfo;
 
 // Material
 uniform Material {
@@ -45,6 +45,8 @@ uniform Shadows {
 	mat4 depthMVP;
 	// Model Matrix
 	mat4 DepthBiasMVP;
+	float zNear;
+	float zFar;
 } shadows;
 
 // uniform sampler2D text;
@@ -102,7 +104,7 @@ void main()
 	  
 	// 	// project sampleP position:
 	//    	vec4 offset = vec4(sampleP, 1.0);
-	//     offset = tranformations.ProjectionMatrix * offset;
+	//     offset = cameraInfo.ProjectionMatrix * offset;
 	//     offset.xy /= offset.w;
 	//     offset.xy = offset.xy * 0.5 + 0.5;
 

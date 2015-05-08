@@ -6,7 +6,7 @@
 
 class Light: public Transform
 {
-private:
+public:
     // Static attributes, this is global to all lights
     static GLuint globalLightBuffer;
     static GLuint lightBuffer; // This is shared between all lights.
@@ -19,6 +19,7 @@ private:
     static GLuint shadowFrameBuffer;
     static int shadowShader;
     static GLuint shadowTexture;
+    static GLuint shadowCubeMap;
 
 
     // Light attributes
@@ -52,7 +53,7 @@ public:
      * The light buffer is shared by all lights, so this
      * method must be called by each light.
      */
-    void activeLight();
+    void activeLight(glm::vec3 direction, glm::vec3 up = glm::vec3(0,1,0));
 
     /**
      *  This method copy the light matrices to shados buffer.
@@ -60,7 +61,7 @@ public:
      * method must be called by each light.
      *  These matrices are used in the shadow mapping technique.
      */
-    void updateMatrices();
+    void updateMatrices(glm::vec3 direction, glm::vec3 up = glm::vec3(0,1,0));
 
     /**
      *  This method initialize the vao and buffers, so it

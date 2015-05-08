@@ -59,6 +59,7 @@ void MeshObject::shadowPass() {
 
     // Draw cube
     for (unsigned int i = 0; i < shapeVector.size(); ++i) {
+    	shapeVector[i]->material->activeMaterial();
 		glDrawArrays(GL_TRIANGLES, shapeVector[i]->begin, shapeVector[i]->end - shapeVector[i]->begin + 1);
 	}
 
@@ -99,7 +100,7 @@ void MeshObject::rendererPass(bool useLight) {
     // Bind texture
     texture.bind();
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, Light::getShadowTexture());
+    glBindTexture(GL_TEXTURE_CUBE_MAP, Light::shadowCubeMap);
     glTexGendv(GL_S,GL_EYE_PLANE,Light::Svec);
     glTexGendv(GL_T,GL_EYE_PLANE,Light::Tvec);
     glTexGendv(GL_R,GL_EYE_PLANE,Light::Rvec);

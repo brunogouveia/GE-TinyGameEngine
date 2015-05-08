@@ -104,6 +104,8 @@ void Cube::shadowPass() {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 9*sizeof(float), (void*)0);
 
+    material->activeMaterial();
+
     // Draw cube
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -149,7 +151,7 @@ void Cube::rendererPass(bool useLight) {
     // Bind texture
     texture.bind();
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, Light::getShadowTexture());
+    glBindTexture(GL_TEXTURE_CUBE_MAP, Light::shadowCubeMap);
     glTexGendv(GL_S,GL_EYE_PLANE,Light::Svec);
     glTexGendv(GL_T,GL_EYE_PLANE,Light::Tvec);
     glTexGendv(GL_R,GL_EYE_PLANE,Light::Rvec);

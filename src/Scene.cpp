@@ -36,8 +36,6 @@ void Scene::firstDraw() {
 void Scene::drawObjectsWithLights() {
 	// For each light
 	for (list<Light*>::iterator curLight = lights.begin(); curLight != lights.end(); curLight++) {
-		// Active current light
-		(*curLight)->activeLight();
 
 		// Disable culling
 		glDisable(GL_CULL_FACE);
@@ -50,24 +48,62 @@ void Scene::drawObjectsWithLights() {
 		glPolygonOffset(3,0);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 
+		glm::vec3 directions[] = {
+				glm::vec3(1.0f, 0.0f, 0.0f),
+				glm::vec3(-1.0f, 0.0f, 0.0f),
+				glm::vec3(0.0f, 1.0f, 0.0f),
+				glm::vec3(0.0f, -1.0f, 0.0f),
+				glm::vec3(0.0f, 0.0f, 1.0f),
+				glm::vec3(0.0f, 0.0f, -1.0f)
+		};
+
+		glm::vec3 ups[] = {
+				glm::vec3(0.0f, -1.0f, 0.0f),
+				glm::vec3(0.0f, -1.0f, 0.0f),
+				glm::vec3(0.0f, 0.0f, 1.0f),
+				glm::vec3(0.0f, 0.0f, -1.0f),
+				glm::vec3(0.0f, -1.0f, 0.0f),
+				glm::vec3(0.0f, -1.0f, 0.0f)
+		};
+
 		// Set depth framebuffer
-		glBindFramebuffer(GL_FRAMEBUFFER, Light::getShadowFrameBuffer());
+		glBindFramebuffer(GL_FRAMEBUFFER, Light::shadowFrameBuffer);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, Light::shadowCubeMap);
+//		glClearColor(1,1,1,1);
+		glEnable(GL_TEXTURE_CUBE_MAP);
 		// Set depthShader
 		glUseProgram(Light::getShadowShader());
 
 		//  No write to color buffer and no smoothing
-	    glShadeModel(GL_FLAT);
-	    glColorMask(0,0,0,0);
-	    // Set view port to depthTexture dimensions
-	    glViewport(0,0,2048,2048);
-	    // Clear depth bit
-	    glClear(GL_DEPTH_BUFFER_BIT);
+//		glShadeModel(GL_FLAT);
+//		glColorMask(0,0,0,0);
+		glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
+		// Set view port to depthTexture dimensions
+		glViewport(0,0,2048,2048);
+		for (int i = 0; i < 6; i++) {
+			// Active current light
+			(*curLight)->activeLight(directions[i], ups[i]);
+			ErrCheck("Light::begin-activeLight");
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, Light::shadowCubeMap, 0);
+			GLenum status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+			    if(status != GL_FRAMEBUFFER_COMPLETE)
+			        printf("Status error: %08x\n", status);
 
-	    // Draw objects with current light
-		for (list<GameObject*>::iterator curObject = objects.begin(); curObject != objects.end(); ++curObject) {
-			(*curObject)->shadowPass();
+			glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+//			glActiveTexture(GL_TEXTURE0 + 1);
+//			        glBindTexture(GL_TEXTURE_CUBE_MAP, Light::shadowCubeMap);
+
+			// Draw objects with current light
+			for (list<GameObject*>::iterator curObject = objects.begin(); curObject != objects.end(); ++curObject) {
+				(*curObject)->shadowPass();
+			}
+			ErrCheck("Light::activeLight");
 		}
-
+//		glDisable(GL_TEXTURE_CUBE_MAP);
+		glClearColor(0,0,0,0);
 		glDisable(GL_POLYGON_OFFSET_FILL);
 
 		// Bind default framebuffer back
@@ -75,8 +111,8 @@ void Scene::drawObjectsWithLights() {
 	    // Enable texture
 	    glEnable(GL_TEXTURE_2D);
 	    // Restore normal drawing state
-	    glShadeModel(GL_SMOOTH);
-	    glColorMask(1,1,1,1);
+//	    glShadeModel(GL_SMOOTH);
+//	    glColorMask(1,1,1,1);
 
 	    // Set window size to normal
 	    glViewport(0,0,GameWindow::width, GameWindow::height);

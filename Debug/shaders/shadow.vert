@@ -1,7 +1,7 @@
 #version 400 core
 
-//  Transformation matrices
-uniform Tranformations {
+//  CameraInfo
+uniform CameraInfos {
    // Projection Matrix
    mat4 ProjectionMatrix;
    // Model Matrix
@@ -10,7 +10,7 @@ uniform Tranformations {
    mat4 ViewMatrix;
    // Normal matrix;
    mat4 NormalMatrix;
-} tranformations;
+} cameraInfo;
 
 uniform Light {
    // Position
@@ -27,16 +27,18 @@ uniform Shadows {
    mat4 depthMVP;
    // Model Matrix
    mat4 DepthBiasMVP;
+   float zNear;
+   float zFar;
 } shadows;
+
 //  Vertex attributes (input)
 layout(location = 0) in vec4 Vertex;
 
-out float dep;
+out vec3 worldPos;
 
 void main()
 {  
    //  Set transformed vertex location
-   gl_Position =  shadows.depthMVP * tranformations.ModelMatrix * Vertex;
-   gl_Position /= gl_Position.w;
-   dep = gl_Position.z;
+   gl_Position =  shadows.depthMVP * cameraInfo.ModelMatrix * Vertex;
+   worldPos = vec3(cameraInfo.ModelMatrix * Vertex);
 }
